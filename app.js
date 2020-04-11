@@ -24,5 +24,5 @@ http.listen(server_port, function() {
 });
 
 
-var testGame = require('./server/test/TestServer.js')(http);
-/* testGame(http); */
+// Socket services:
+var test = require('./server/test/TestServer.js')(http);

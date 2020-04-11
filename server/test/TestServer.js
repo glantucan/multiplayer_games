@@ -32,23 +32,23 @@ function testServer(http) {
                 
                 socket.on('disconnect', disconnect);
                 socket.on('leave-game', leaveGame);
-                socket.on('key-press', onKeyPress);
+                socket.on('input-key-event', onKeyboardEvent);
 
-                function onKeyPress(data) {
-                    if (connectedPlayer.id === data.playerId) {   
-                        if (      data.inputId === 'left') {
-                            connectedPlayer.pressingLeft = data.state;
-                        }
-                        else if ( data.inputId === 'right') {
-                            connectedPlayer.pressingRight = data.state;
-                        }
-                        else if ( data.inputId === 'down') {
-                            connectedPlayer.pressingDown = data.state;
-                        }
-                        else if ( data.inputId === 'up') {
-                            connectedPlayer.pressingUp = data.state;
-                        } 
+                function onKeyboardEvent(data) {
+                    // if (connectedPlayer.id === data.playerId) {   
+                    if (      data.actionId === 'LEFT') {
+                        connectedPlayer.pressingLeft = data.state;
                     }
+                    else if ( data.actionId === 'RIGHT') {
+                        connectedPlayer.pressingRight = data.state;
+                    }
+                    else if ( data.actionId === 'DOWN') {
+                        connectedPlayer.pressingDown = data.state;
+                    }
+                    else if ( data.actionId === 'UP') {
+                        connectedPlayer.pressingUp = data.state;
+                    } 
+                    // }
                 }
 
                 function leaveGame() {
