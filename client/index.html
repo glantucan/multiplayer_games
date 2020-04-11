@@ -12,7 +12,20 @@
     <div class="container">
     <h1>Multiplayer games</h1>
         <ol>
-            <li><a href="/client/test.html">Test multiplayer</a></li>
+            <li><a href="/client/test.html">Test 1</a>: <br>
+                <ol>
+                    <li>Client sends input events to server</li>
+                    <li>Calculate movements on server</li>
+                    <li>send new positions to clients</li>
+                </ol>
+            <li><a href="/client/test2.html">Test 2:</a>
+                <ol>
+                    <li>Client sends input events to server</li>
+                    <li>Server register all client inputs on a queue</li>
+                    <li>On each step of the game loop, sends all registered inputs to clients, and clears the inputs queue</li>
+                    <li>Each client calculates movements and render results</li>
+                </ol>
+            </li>
             <li><a href="/client/simon.html">Simon</a></li>
 
         </ol>

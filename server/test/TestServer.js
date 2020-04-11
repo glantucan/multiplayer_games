@@ -9,11 +9,11 @@ var lastId = 0;
 function testServer(http) {
     const io = require('socket.io')(http, {});
     var test = io
-    .of('/test')
+    .of('/test') // namespace this socket service
     .on('connection', function(socket) {
-        console.log('socket connected');
         
         socketList.push(socket);
+        socketList.clientLog('socket connection registered for anonymous watcher');
 
         socket.on( 'join-game', 
             function (data) {
@@ -68,12 +68,14 @@ function testServer(http) {
                 }
             }
         ); 
-        socketList.clientLog('socket connection registered for anonymous watcher');
         
     });
     return test;
 }
 
+
+/// Game loop
+//
 setInterval(function() {
     var playersUpdate = [];
     playersUpdate = playerList.map( function(currentPlayer) {
