@@ -6,11 +6,8 @@ var socketList = SocketList();
 var playerList = [];
 var lastId = 0;
 
-function testServer(http) {
-    const io = require('socket.io')(http, {});
-    var test = io
-    .of('/test') // namespace this socket service
-    .on('connection', function(socket) {
+function testServer(socketNamespace) {
+    socketNamespace.on('connection', function(socket) {
         
         socketList.push(socket);
         socketList.clientLog('socket connection registered for anonymous watcher');
@@ -70,7 +67,7 @@ function testServer(http) {
         ); 
         
     });
-    return test;
+    return socketNamespace;
 }
 
 

@@ -1,7 +1,12 @@
-
+var playerList = [];
+var socketList = [];
 var lastId = 0;
 
-const Player = function (name, socket) {
+const Player = function (playerData) {
+    var {
+        name, 
+        id } = playerData;
+
     var x = 250;
     var y = 250;
     var accel = 3;
@@ -9,16 +14,16 @@ const Player = function (name, socket) {
     var maxSpeed = 10;
     var vx = 0;
     var vy = 0;
-    var pressingRight = false;
-    var pressingLeft =  false;
-    var pressingUp = false;
-    var pressingDown = false;
+    var moveRight = false;
+    var moveLeft =  false;
+    var moveUp = false;
+    var moveDown = false;
 
-    function updatePosition () {
-        if ( pressingRight ) {
+    function update() {
+        if ( moveRight ) {
             vx += vx <= maxSpeed ? accel : 0;
         } 
-        else if ( pressingLeft ) {
+        else if ( moveLeft ) {
             vx -= vx >= -maxSpeed ? accel : 0;
         } 
         else if ( vx !== 0 ) {
@@ -28,10 +33,10 @@ const Player = function (name, socket) {
             }
         }
 
-        if ( pressingUp ) {
+        if ( moveUp ) {
             vy -= vy >= -maxSpeed ? accel : 0;
         } 
-        else if ( pressingDown ) {
+        else if ( moveDown ) {
             vy += vy <= maxSpeed ? accel : 0;
         } 
         else if ( vy !== 0) {
@@ -48,18 +53,18 @@ const Player = function (name, socket) {
     }
 
     return {
-        id: lastId++, 
-        socket,
-        name,
+        getId() { return id; }, 
         getX() { return x; },
         getY() { return y; },
-        set pressingRight(val) { pressingRight = val; },
-        set pressingLeft(val) { pressingLeft = val; },
-        set pressingUp(val) { pressingUp = val; },
-        set pressingDown(val) { pressingDown = val; },
-        updatePosition
+        actions: {
+            moveRight(val) { moveRight = val; },
+            moveLeft(val) { moveLeft = val; },
+            moveUp(val) { moveUp = val; },
+            moveDown(val) { moveDown = val; },
+        },
+        update
     };
 }
 
 
-module.exports = Player;
+export default Player;

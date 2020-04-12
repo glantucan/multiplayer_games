@@ -9,10 +9,6 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + '/client/index.html');
 });
 
-app.get('/test', function (req, res) {
-    
-    res.sendFile(__dirname + '/client/test.html');
-});
 
 // Serve any requested files from the client folder (for example the images used on index.html)
 app.use('/client', express.static(__dirname + '/client'));
@@ -24,5 +20,7 @@ http.listen(server_port, function() {
 });
 
 
-// Socket services:
-var test = require('./server/test/TestServer.js')(http);
+// Socket multiplexing:
+const io = require('socket.io')(http, {});
+var test = require('./server/test/TestServer.js')(io.of('/test'));
+var test2 = require('./server/test/Test2Server.js')(io.of('/test2'));
