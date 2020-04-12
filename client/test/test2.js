@@ -87,7 +87,7 @@ socket.on('game-loop-step', function(actionsQueue) {
     });
 
     ctx.clearRect(0,0,500,500);
-    log(playersList.map(player => player.getX() + ', ' + player.getY()));
+    
     playersList.forEach( function(player) {
         player.update();
         ctx.fillText(player.getId(), player.getX(), player.getY());
