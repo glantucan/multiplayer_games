@@ -21,7 +21,9 @@ function test2Server(socketNamespace) {
                 playersList.push(playerData);
 
                 // Return player id to player client
-                socket.emit('joined', playerData);
+                socket.emit('joined', { 
+                    playerData, 
+                    serverPlayersList: playersList } );
 
                 // Comunicate other clients that this player joined (updates playersList)
                 socket.broadcast.emit('another-player-joined', playerData);
@@ -43,15 +45,17 @@ function test2Server(socketNamespace) {
                     });
                 }
 
-                function leaveGame() {
-                    playersList = playersList.filter( (p) => p !== connectedPlayer );
-                    socketList.dispatch('players-list-update', playersList.map(
+                function leaveGame({playerId, name}) {
+                    var newPlayersList = playersList.filter( (p) => p.id !== playerId );
+                    socketList.dispatch('a-player-left', {playerId, name});
+                    socketList.dispatch('players-list-update', newPlayersList.map(
                         player => ({
                             name: player.name,
                             id: player.id,
                         })
                     ));
-                    socketList.clientLog(connectedPlayer.name + ' is leaving the game');
+                    socketList.clientLog(name + ' is leaving the game');
+                    console.log(name + ' is leaving the game')
                 }
 
                 function disconnect() {

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Simon Multiplayer</title>
+    <title>Multiplayer games</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
    
 </head>
@@ -15,8 +15,8 @@
             <li><a href="/client/test.html">Test 1</a>: <br>
                 <ol>
                     <li>Client sends input events to server</li>
-                    <li>Calculate movements on server</li>
-                    <li>send new positions to clients</li>
+                    <li>Calculate all game state on server</li>
+                    <li>Send new state to clients, which just render game.</li>
                 </ol>
             <li><a href="/client/test2.html">Test 2:</a>
                 <ol>
@@ -25,9 +25,10 @@
                     <li>On each step of the game loop, sends all registered inputs to clients, and clears the inputs queue</li>
                     <li>Each client calculates movements and render results</li>
                 </ol>
+                
             </li>
             <li><a href="/client/simon.html">Simon</a></li>
-
+            <li><a href="/client/snake.html">Snake</a></li>
         </ol>
     </div>
 

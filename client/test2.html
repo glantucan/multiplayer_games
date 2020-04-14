@@ -14,7 +14,14 @@
 <body>
 
     <div class="container">
+    
     <h1>Test multiplayer 2</h1>
+    <h2>Dumb server</h2>
+    <p>Doesn't sync players state when a new player connects. That's doable but I decided not to follow this approach.</p>
+    <p>It's ok if the game doesn't start until all players have joined, and no new players are allowed until the game ends. Else every gameobject state has to be exactly synchronized upon connection on the new client. As the server is supposed to be completely dumb that data would need to be taken form another client.</p>
+    <p>Also, every client acts as an independent thread running the same code. Random state changes and timer events need to be synchronized on all clients. That's another can of worms.</p>
+    <p>Maybe one of the clients, the one with the lowest lantency, could be considered the authority regarding timer events and random state changes. But maintaining the clients in sync can become extremely complex.</p>
+    <p>Another option is to run all timer events and random state chenge login on the server. Less latency, but not prettier.</p>
         <form>
             <div class="form-group">
             <label for="playerName">Nick name</label>

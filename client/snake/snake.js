@@ -1,13 +1,14 @@
 import inputKeys from '/client/utils/InputKeys.js';
 import KeyCodes from '/client/utils/KeyCodes.js';
-
-
+import Canvas from '/client/utils/CanvasHelper.js';
 
 const ctx = document.getElementById("ctx").getContext("2d");
 const playerNameField = document.getElementById("playerName");
 const playBtn = document.getElementById("playBtn");
 const leaveBtn = document.getElementById("leaveBtn");
 const playersList = document.getElementById("playersList");
+
+var canvas = Canvas(ctx);
 
 var playerId;
 playerNameField.addEventListener('input',
@@ -40,17 +41,45 @@ leaveBtn.addEventListener('click',
 
 ctx.font = '30px Arial';
 
-var socket = io.connect('/test');
+var socket = io.connect('/snake');
+
 
 
 /// Listen for server messages
 //
 socket.on('joined', (id) => playerId = id);
 
+var playerColors = [
+    '#EA8588',
+    '#836792',
+    '#54912F',
+    '#6C7AF3'
+]
 socket.on('new-position', function(data) {
     ctx.clearRect(0,0,500,500);
     data.forEach( function (playerData) {
-        ctx.fillText(playerData.id, playerData.x, playerData.y);
+        
+        playerData.color = playerColors[playerData.id];
+        canvas.drawRectangle(
+            playerData.x + 1, 
+            playerData.y + 1, 
+            8, 8, 
+            playerData.color, 
+            playerData.color, 
+            2
+        );
+
+        playerData.tail.forEach( function (cell) {
+            canvas.drawRectangle(
+                cell.x + 1, 
+                cell.y + 1, 
+                8, 8, 
+                playerData.color, 
+                playerData.color, 
+                2
+            );
+        })
+        //ctx.fillText(playerData.id, playerData.x, playerData.y);
     });
 });
 
@@ -61,7 +90,9 @@ socket.on('server-message', (message) => {
 
 
 socket.on('players-list-update', function(data) {
-    Array.from(playersList.children).forEach(child => playersList.removeChild(child));
+    Array.from(playersList.children)
+        .forEach( child => playersList.removeChild(child) );
+        
     data.forEach(function(playerData) {
         var playerNode = document.createElement('p');
         playerNode.id = 'player_' + playerData.id;
@@ -70,6 +101,7 @@ socket.on('players-list-update', function(data) {
         playersList.appendChild(playerNode);
     });
 });
+
 
 //// Keyboard control
 //
@@ -81,9 +113,7 @@ function onKeyEvent(key) {
     });
 }
 
-inputKeys.addKey('DOWN',    [KeyCodes.DOWN,     KeyCodes.S], onKeyEvent );
-inputKeys.addKey('UP',      [KeyCodes.UP,       KeyCodes.W], onKeyEvent );
-inputKeys.addKey('LEFT',    [KeyCodes.LEFT,     KeyCodes.A], onKeyEvent );
-inputKeys.addKey('RIGHT',   [KeyCodes.RIGHT,    KeyCodes.D], onKeyEvent );
+inputKeys.addKey('turnLeft',    [KeyCodes.LEFT,     KeyCodes.A], onKeyEvent );
+inputKeys.addKey('turnRight',   [KeyCodes.RIGHT,    KeyCodes.D], onKeyEvent );
 
 inputKeys.activate();

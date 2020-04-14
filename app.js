@@ -24,3 +24,5 @@ http.listen(server_port, function() {
 const io = require('socket.io')(http, {});
 var test = require('./server/test/TestServer.js')(io.of('/test'));
 var test2 = require('./server/test/Test2Server.js')(io.of('/test2'));
+var test2 = require('./server/snake/SnakeServer.js')(io.of('/snake'));
+

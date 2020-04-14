@@ -38,7 +38,10 @@ leaveBtn.addEventListener('click',
         leaveBtn.hidden = true;
         playBtn.hidden = false;
         playerNameField.disabled = false;
-        socket.emit('leave-game', { name: playerNameField.value} );
+        socket.emit('leave-game', {
+            playerId,  
+            name: playersList.find( p => p.getId() === playerId ).name
+        });
     }
 );
 
@@ -49,13 +52,16 @@ var socket = io.connect('/test2');
 
 /// Listen for server messages
 //
-socket.on('joined', function (playerData) {
-    playersList.push( Player(playerData) );
+socket.on('joined', function ( {playerData, serverPlayersList} ) {
+    playersList = serverPlayersList.map( pData => Player(pData) );
     playerId = playerData.id;  
 });
 
 socket.on('another-player-joined', function(playerData) {
     playersList.push(Player(playerData));
+});
+socket.on('a-player-left', function(playerData) {
+    playersList = playersList.filter( p => p.getId() !== playerData.playerId );
 });
 
 // This only updates the players list on the DOM
