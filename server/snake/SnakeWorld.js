@@ -8,26 +8,12 @@ function SnakeWorld() {
 
     }
 
-    function worldWrap(x, y){
+    function worldWrap(x, y) {
         if ( x >= cellSize * w )      x = 0;
         if ( x < 0 )                  x = cellSize * ( w - 1 );
         if ( y >= cellSize * h )      y = 0;
         if ( y < 0 )                  y = cellSize * ( h - 1 );
         return {x, y};
-    }
-
-    function computeCellPosition(position, shift) {
-
-        // This doesn't work. When wrapping, we are getting bad positions because 
-        // we should use the previous cell instead the head as reference.
-        var {x, y} = position;
-        var {x: sX, y: sY} = shift;
-        var unWrappedPos = { 
-            x: x + sX * cellSize,
-            y: y + sY * cellSize
-        };
-        console.log(unWrappedPos)
-        return worldWrap(unWrappedPos.x, unWrappedPos.y);
     }
 
 
@@ -39,7 +25,6 @@ function SnakeWorld() {
         get cellSize() { return cellSize; },
         get worldSize() { return {w, h}},
         update,
-        computeCellPosition,
         worldWrap,
         destroy,
     }

@@ -50,14 +50,20 @@ var socket = io.connect('/snake');
 socket.on('joined', (id) => playerId = id);
 
 var playerColors = [
-    '#EA8588',
+    'black',
     '#836792',
     '#54912F',
-    '#6C7AF3'
+    '#6C7AF3','#EA8588'
 ]
-socket.on('new-position', function(data) {
+socket.on('update', function (data) {
+    renderPlayers(data.playersData);
+    killPlayers(data.dead);
+    renderFruits(data.fruits);
+})
+
+function renderPlayers (players) {
     ctx.clearRect(0,0,500,500);
-    data.forEach( function (playerData) {
+    players.forEach( function (playerData) {
         
         playerData.color = playerColors[playerData.id];
         canvas.drawRectangle(
@@ -81,6 +87,19 @@ socket.on('new-position', function(data) {
         })
         //ctx.fillText(playerData.id, playerData.x, playerData.y);
     });
+}
+
+function killPlayers(dead) {
+    if (dead.length) log(dead);
+}
+
+function renderFruits(fruits) {
+
+}
+
+
+socket.on('new-position', function(data) {
+    
 });
 
 socket.on('server-message', (message) => {

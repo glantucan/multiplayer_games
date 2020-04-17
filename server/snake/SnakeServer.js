@@ -1,13 +1,17 @@
 const { performance } = require('perf_hooks');
-const SnakePlayer = require('./SnakePlayer.js');
 const SocketList = require('../SocketList.js');
 const SnakeWorld = require('./SnakeWorld.js');
+const SnakePlayer = require('./SnakePlayer.js');
+const SnakePlayerList = require('./SnakePlayerList.js');
+const SnakeCollisions = require('./SnakeCollisions.js');
 
 var gameLoop;
 var socketList = SocketList();
-var playerList = [];
-var lastId = 0;
+var playersList = SnakePlayerList();
+var lastId = 1;
 var snakeWorld;
+var collisionChecker;
+var otherColliders = [];
 
 /**
  * Creates the snake game server app.
@@ -22,8 +26,13 @@ function createSnakeServer(socketNamespace) {
         
         socket.on( 'join-game', function onPlayerJoining(playerData) { 
 
-            if (!snakeWorld) snakeWorld = SnakeWorld();
-            if (!gameLoop) gameLoop = createGameLoop(10, update);
+            if (!snakeWorld) {
+                snakeWorld = SnakeWorld();
+                collisionChecker = SnakeCollisions(snakeWorld, otherColliders);
+                playersList.collisionChecker = collisionChecker
+            }
+
+            if (!gameLoop) gameLoop = createGameLoop(3, update);
 
             managePlayerComunications(playerData, socket) ;
         });
@@ -43,15 +52,16 @@ function managePlayerComunications(playerData, socket) {
         ...playerData,
         id: lastId++,
         snakeWorld,
-        startConfIdx: playerList.length
+        startConfIdx: playersList.length,
+        collisionChecker
     });
-    playerList.push(connectedPlayer);
+    playersList.push(connectedPlayer);
     
     socket.emit('joined', connectedPlayer.id);
 
     socketList.clientLog(playerData.name + ' joined the game');
 
-    socketList.dispatch('players-list-update', playerList.map(
+    socketList.dispatch('players-list-update', playersList.list.map(
         player => ({
             name: player.getName(),
             id: player.getId(),
@@ -59,11 +69,12 @@ function managePlayerComunications(playerData, socket) {
     ));
 
 
-    socket.on('disconnect', (data) => disconnect(data, socket, connectedPlayer) );
-    socket.on('leave-game', (data) => leaveGame(data, connectedPlayer) );
+    socket.on('disconnect', (data) => disconnect( socket, connectedPlayer) );
+    socket.on('leave-game', (data) => leaveGame( connectedPlayer) );
     socket.on('input-key-event', connectedPlayer.onInputEvent);
 
 }
+
 
 
 /**
@@ -72,10 +83,10 @@ function managePlayerComunications(playerData, socket) {
  * @param {*} data 
  * @param {*} player 
  */
-function leaveGame(data, player) {
-    playerList = playerList.filter( (p) => p !== player );
+function leaveGame(player) {
+    players = playersList.list.filter( (p) => p !== player );
     
-    socketList.dispatch('players-list-update', playerList.map(
+    socketList.dispatch('players-list-update', players.map(
         player => ({
             name: player.getName(),
             id: player.getId(),
@@ -84,7 +95,7 @@ function leaveGame(data, player) {
 
     socketList.clientLog(player.getName() + ' is leaving the game');
     
-    if (playerList.length === 0) {
+    if (players.length === 0) {
         snakeWorld.destroy();
         snakeWorld = null;
         clearInterval(gameLoop);
@@ -101,7 +112,7 @@ function leaveGame(data, player) {
  * @param {*} socket 
  * @param {*} player 
  */
-function disconnect(data, socket, player) {
+function disconnect( socket, player) {
     if (player) leaveGame(player);
     socketList.remove(socket);
 }
@@ -128,22 +139,21 @@ function createGameLoop(frameRate, updateCallback) {
     return interval;
 }
 
+function _onHeadHeadColision(dyingPlayers) {
+    socketList.dispatch('players-dead', dyingplayers.list.map( p => p.getId()));
+}
 
+function _onHeadTailColision(dyingPlayer, otherPlayer) {
+    socketList.dispatch('players-dead', [dyingPlayer.getId()]);
+}
 
 function update(frameCount, timeElapsed) {
-    var playersUpdate = [];
-        playersUpdate = playerList.map( function(currentPlayer) {
-            currentPlayer.update(frameCount, timeElapsed);
-            
-            return {
-                id: currentPlayer.getId(),
-                x: currentPlayer.getX(),
-                y: currentPlayer.getY(),
-                tail: currentPlayer.getTail(),
-            };
-        });
-        snakeWorld.update(frameCount, timeElapsed);
-        socketList.dispatch('new-position',playersUpdate);
+    var updateData = {
+        playersData: playersList.update(frameCount, timeElapsed),
+        ...snakeWorld.update(frameCount, timeElapsed),
+    } 
+    console.log(updateData);
+    socketList.dispatch('update', updateData);
         
 }
 
